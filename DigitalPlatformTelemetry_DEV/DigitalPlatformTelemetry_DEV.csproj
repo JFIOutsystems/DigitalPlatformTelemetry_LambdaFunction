@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <AWSProjectType>Lambda</AWSProjectType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.APIGatewayEvents" Version="1.1.2" />
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.4.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="AWSSDK.Core">
+      <HintPath>..\..\..\..\Program Files (x86)\AWS SDK for .NET\bin\Net45\AWSSDK.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.Kinesis">
+      <HintPath>..\..\..\..\Program Files (x86)\AWS SDK for .NET\bin\Net45\AWSSDK.Kinesis.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.KinesisFirehose">
+      <HintPath>..\..\..\..\Program Files (x86)\AWS SDK for .NET\bin\Net45\AWSSDK.KinesisFirehose.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.Lambda">
+      <HintPath>..\..\..\..\Program Files (x86)\AWS SDK for .NET\bin\Net45\AWSSDK.Lambda.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.SecurityHub">
+      <HintPath>..\..\..\..\Program Files (x86)\AWS SDK for .NET\bin\Net45\AWSSDK.SecurityHub.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.SecurityToken">
+      <HintPath>..\..\..\..\Program Files (x86)\AWS SDK for .NET\bin\Net45\AWSSDK.SecurityToken.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
