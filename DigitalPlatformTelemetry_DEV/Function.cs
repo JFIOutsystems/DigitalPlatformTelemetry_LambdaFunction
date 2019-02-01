@@ -18,6 +18,7 @@ namespace DigitalPlatformTelemetry_DEV
     public class TelemetryList
     {
         public IList<Telemetry> Telemetry { get; set; }
+
     }
 
     public class Function
@@ -34,36 +35,25 @@ namespace DigitalPlatformTelemetry_DEV
             APIGatewayProxyResponse APIResponse = new APIGatewayProxyResponse();
             try
             {
-                    /*Json to Telemetry List*/
-                    TelemetryList telemetryList = JsonConvert.DeserializeObject<TelemetryList>(request.Body);
-                    int ItemCount = telemetryList.Telemetry.Count;
+                bool EVSendToFirehose = Environment.GetEnvironmentVariable("PUSH_TO_FIREHOSE").ToUpper() == "TRUE";
 
-                    /*Get Environment Vars*/
-                    string EVDeliveryStream = Environment.GetEnvironmentVariable("FIREHOSE_DELIVERYSTREAM");
-                    string EVRegion = Environment.GetEnvironmentVariable("REGION");
-                    bool EVSendToFirehose = Environment.GetEnvironmentVariable("PUSH_TO_FIREHOSE").ToUpper() == "TRUE";
-
-                    if (ItemCount > 0 && EVSendToFirehose) // Only Processes if ItemCount is >0 and SentToFirehose==True
+               
+                    if ( EVSendToFirehose) // Only Processes if SentToFirehose==True
                     {
+                        /*Json to Telemetry List*/
+                        TelemetryList telemetryList = JsonConvert.DeserializeObject<TelemetryList>(request.Body);
+                        int ItemCount = telemetryList.Telemetry.Count;
+
+                        /*Get Environment Vars*/
+                        string EVDeliveryStream = Environment.GetEnvironmentVariable("FIREHOSE_DELIVERYSTREAM");
+                        string EVRegion = Environment.GetEnvironmentVariable("REGION");
                         byte[] oByte;
 
-                        int CountProcessed = 0;
+                        Amazon.RegionEndpoint Region= Amazon.RegionEndpoint.GetBySystemName(EVRegion);
 
-
-                        //Region Validation
-                        Amazon.RegionEndpoint Region;
-                        if (EVRegion==null || EVRegion.Length == 0)
-                        {
-                            Region = Amazon.RegionEndpoint.GetBySystemName("us-east-1");
-                        }
-                        else
-                        {
-                            Region = Amazon.RegionEndpoint.GetBySystemName(EVRegion);
-                        }
-
-                        for (int i = 0; i < ItemCount; i++) {
-                            telemetryList.Telemetry[i].Instant = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                            oByte = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(telemetryList.Telemetry[i]));
+                        foreach(Telemetry telemetry in telemetryList.Telemetry) {
+                            telemetry.Instant = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                            oByte = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(telemetry));
                             using (MemoryStream ms = new MemoryStream(oByte))
                             {
                                 Record RecordToSend = new Record
@@ -81,19 +71,17 @@ namespace DigitalPlatformTelemetry_DEV
 
                                 PutRecordResponse Response = FirehoseClient.PutRecord(DeliveryRequest);
 
-                                CountProcessed +=1;
-
                             }
 
                         }
 
                         APIResponse.StatusCode = 200;
-                        APIResponse.Body = "Sucess, processed " + CountProcessed + " items " + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                        APIResponse.Body = "Sucess, processed " + ItemCount + " items " + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                         return APIResponse;
 
                     }
                     APIResponse.StatusCode = 200;
-                    APIResponse.Body = APIResponse.Body = "Sucess, no entries processed. " + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                    APIResponse.Body = APIResponse.Body = "Sucess, no entries processed ( PUSH_TO_FIREHOSE = False ). " + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                     return APIResponse;
               
             }
