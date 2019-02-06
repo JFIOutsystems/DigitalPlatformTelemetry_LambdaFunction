@@ -1,4 +1,5 @@
 ﻿
+using Newtonsoft.Json;
 
 namespace DigitalPlatformTelemetry_DEV
 {
@@ -11,7 +12,7 @@ namespace DigitalPlatformTelemetry_DEV
             this.LogType = logtype;
             this.AppSource = appSource;
             this.Instant = instant;
-            this.Payload = payload;
+            this.Payload = DeserializePayload(payload);
         }
 
         public string Id { get; set; }
@@ -19,6 +20,13 @@ namespace DigitalPlatformTelemetry_DEV
         public string LogType { get; set; }
         public string AppSource { get; set; }
         public string Instant { get; set; }
-        public string Payload { get; set; }
+        public object Payload { get; set; }
+
+        public object DeserializePayload(string payload)
+        {
+
+            try { return JsonConvert.DeserializeObject<object>(payload); }
+            catch { return payload; }
+        }
     }
 }
