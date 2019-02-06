@@ -53,7 +53,8 @@ namespace DigitalPlatformTelemetry_DEV
 
                         foreach(Telemetry telemetry in telemetryList.Telemetry) {
                             telemetry.Instant = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                            oByte = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(telemetry));
+                            
+                            oByte = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new TelemetryOut(telemetry)));
                             using (MemoryStream ms = new MemoryStream(oByte))
                             {
                                 Record RecordToSend = new Record
