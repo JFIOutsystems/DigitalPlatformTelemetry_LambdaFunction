@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Serverless Specification template describing your function.
+Resources:
+  DigitalTelemetryDEV:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: >-
+        DigitalPlatformTelemetry::DigitalPlatformTelemetry.Function::FunctionHandler
+      Runtime: dotnetcore2.1
+      CodeUri: .
+      Description: ''
+      MemorySize: 256
+      Timeout: 15
+      Role: 'arn:aws:iam::421098555896:role/service-role/DigitalTelemetry_DEV'
+      Events:
+        Api1:
+          Type: Api
+          Properties:
+            Path: /
+            Method: PUT
+      Environment:
+        Variables:
+          FIREHOSE_DELIVERYSTREAM: DigitalPlatformTelemetry
+          PUSH_TO_FIREHOSE: 'TRUE'
+          REGION: us-east-1
